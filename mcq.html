@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ Test</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>MCQ Test in Progress</h1>
+        <div id="timer-display">Time Left: <span id="time">--:--</span></div>
+    </header>
+
+    <main id="quiz-area">
+        <div id="loading-message">Loading questions...</div>
+        <!-- Questions will be loaded here by JavaScript -->
+        <!-- Example structure for one question (will be dynamically generated):
+        <section class="question-block" data-question-index="0">
+            <h2 class="subject-header">Subject: Science</h2>
+            <p class="question-text">1. What is the powerhouse of the cell?</p>
+            <div class="options">
+                <label><input type="radio" name="q0" value="a"> A) Nucleus</label>
+                <label><input type="radio" name="q0" value="b"> B) Ribosome</label>
+                <label><input type="radio" name="q0" value="c"> C) Mitochondrion</label>
+                <label><input type="radio" name="q0" value="d"> D) Golgi Apparatus</label>
+            </div>
+        </section>
+        -->
+    </main>
+
+    <footer>
+        <button id="submit-test-btn">Submit Test</button>
+        <p>© 2024 MCQ Challenge Portal</p>
+        <!-- Navigation buttons (Prev/Next) could be added here or within the main area -->
+    </footer>
+
+    <!-- Data files must be loaded BEFORE mcq.js if not using modules -->
+    <!-- Adjust path based on final structure if needed -->
+    <script src="js/data/see_questions.js"></script>
+    <script src="js/data/basic_questions.js"></script> <!-- Needed for correct functioning later, even if unused now -->
+    <script src="js/data/ktm_questions.js"></script> <!-- Needed for correct functioning later, even if unused now -->
+
+    <script src="js/mcq.js"></script>
+    <!-- We might add utils.js later -->
+</body>
+</html>
