@@ -1,20 +1,34 @@
-// js/selection.js
+// js/selection.js (FINAL VERSION - Use this whole file)
 document.addEventListener('DOMContentLoaded', () => {
     const configForm = document.getElementById('config-form');
     const numQuestionsInput = document.getElementById('num-questions');
     const timeLimitInput = document.getElementById('time-limit');
-    const subjectCheckboxes = document.querySelectorAll('input[name="subject"]'); // Only relevant for SEE page
+    const subjectCheckboxes = document.querySelectorAll('input[name="subject"]');
     const startTestBtn = document.getElementById('start-test-btn');
-    const configMessage = document.getElementById('config-message'); // General messages
+    const configMessage = document.getElementById('config-message');
     const errorNumQuestions = document.getElementById('error-num-questions');
     const errorTimeLimit = document.getElementById('error-time-limit');
-    const errorSubjects = document.getElementById('error-subjects'); // Only for SEE page
+    const errorSubjects = document.getElementById('error-subjects');
 
-    // Determine level from URL or a data attribute if needed - assume SEE for now
-    const currentLevel = 'see'; // Could be made dynamic later
+    // --- Determine Level ---
+    // Simple way: Infer from filename (requires specific naming)
+    let currentLevel = 'unknown';
+    const path = window.location.pathname;
+    if (path.includes('selection_see.html')) {
+        currentLevel = 'see';
+    } else if (path.includes('selection_basic.html')) {
+        currentLevel = 'basic';
+    } else if (path.includes('selection_ktm.html')) {
+        currentLevel = 'ktm';
+    }
+    // Disable subject selection if not SEE
+    if (currentLevel !== 'see' && document.getElementById('subject-selection-fieldset')) {
+       document.getElementById('subject-selection-fieldset').style.display = 'none'; // Assuming you add this ID to the fieldset
+    }
+
 
     configForm.addEventListener('submit', (event) => {
-        event.preventDefault(); // Stop form submission
+        event.preventDefault();
         clearErrors();
 
         // --- Validation ---
@@ -22,40 +36,36 @@ document.addEventListener('DOMContentLoaded', () => {
         const numQuestions = parseInt(numQuestionsInput.value, 10);
         const timeLimit = parseInt(timeLimitInput.value, 10);
 
-        // Validate Number of Questions
         if (isNaN(numQuestions) || numQuestions < 1 || numQuestions > 100) {
             showError(errorNumQuestions, 'Please enter a number between 1 and 100.');
             isValid = false;
         }
 
-        // Validate Time Limit
         if (isNaN(timeLimit) || timeLimit < 1 || timeLimit > 180) {
             showError(errorTimeLimit, 'Please enter a number between 1 and 180.');
             isValid = false;
         }
 
-        // Validate Subjects (Only for SEE level)
         let selectedSubjects = [];
-        if (currentLevel === 'see' && subjectCheckboxes.length > 0) {
+        if (currentLevel === 'see') {
             selectedSubjects = [...subjectCheckboxes]
                 .filter(checkbox => checkbox.checked)
                 .map(checkbox => checkbox.value);
-
-            if (selectedSubjects.length === 0) {
+            if (selectedSubjects.length === 0 && errorSubjects) {
                 showError(errorSubjects, 'Please select at least one subject.');
-                // Use configMessage for temporary popup as well
-                 showMessage(configMessage, 'Please select at least one subject.', 'error');
+                showMessage(configMessage, 'Please select at least one subject.', 'error');
                 isValid = false;
             }
-        }
-         // Basic/KTM levels have fixed subjects, assigned later in mcq.js
-         else if (currentLevel === 'basic' || currentLevel === 'ktm') {
+        } else if (currentLevel === 'basic' || currentLevel === 'ktm') {
             selectedSubjects = ['Math', 'Physics', 'Chemistry', 'Biology', 'English']; // Fixed list
-         }
-
+        } else {
+            // Unknown level - shouldn't happen if filename check works
+             showMessage(configMessage, 'Error: Could not determine test level.', 'error');
+             isValid = false;
+        }
 
         if (!isValid) {
-            return; // Stop if validation fails
+            return;
         }
 
         // --- Store Configuration ---
@@ -65,52 +75,72 @@ document.addEventListener('DOMContentLoaded', () => {
             timeLimit: timeLimit * 60, // Store time in seconds
             subjects: selectedSubjects
         };
-
-        // Use Session Storage: Clears when the browser tab is closed
         sessionStorage.setItem('mcqTestConfig', JSON.stringify(configuration));
 
-        // --- Navigate to MCQ Page ---
-        // !! IMPORTANT: This navigation will be blocked by your Cloudflare Middleware
-        // !! if the required COOKIE (e.g., 'see_code') is not present.
-        // !! The user MUST have entered a valid code on index.html previously.
-        window.location.href = 'mcq.html';
+        // --- Navigate to MCQ Page (with level parameter) ---
+        // This redirection will be checked by the middleware
+        window.location.href = `mcq.html?level=${configuration.level}`; // <-- ADDED LEVEL PARAMETER HERE
 
     });
 
     function showError(element, message) {
-        if (element) { // Check if element exists (for subject errors)
+        if (element) {
             element.textContent = message;
-            element.style.display = 'block'; // Make sure it's visible
-             element.style.color = 'red'; // Ensure red color as requested
+            element.style.display = 'block';
+            element.style.color = 'red';
         }
     }
 
     function showMessage(element, text, type = 'info', duration = 2000) {
-         if (!element) return;
-         element.textContent = text;
-         element.className = `message ${type}`;
-         element.style.display = 'block';
-         if (duration > 0) {
-            setTimeout(() => {
-               if (element.textContent === text) { // Clear only if msg hasn't changed
+        if (!element) return;
+        element.textContent = text;
+        element.className = `message ${type}`;
+        element.style.display = 'block';
+
+        if (element.timeoutId) { clearTimeout(element.timeoutId); } // Clear previous timeout
+
+        if (duration > 0) {
+            element.timeoutId = setTimeout(() => {
+               if (element.textContent === text) {
                  element.style.display = 'none';
                  element.textContent = '';
                  element.className = 'message';
+                 element.timeoutId = null;
                }
             }, duration);
-         }
+        } else {
+             element.timeoutId = null;
+        }
     }
-
 
     function clearErrors() {
         [errorNumQuestions, errorTimeLimit, errorSubjects, configMessage].forEach(el => {
             if (el) {
                 el.textContent = '';
-                el.style.display = 'none'; // Hide inline error texts
+                el.style.display = 'none';
             }
         });
-         // Clear popup message explicitely if needed or rely on showMessage timeout
-         if(configMessage) configMessage.style.display = 'none';
+        if(configMessage) {
+             configMessage.style.display = 'none';
+              if(configMessage.timeoutId) {
+                   clearTimeout(configMessage.timeoutId);
+                   configMessage.timeoutId = null;
+              }
+        }
 
     }
+
+    // --- Update Price Display Based on Level ---
+    const priceDisplayArea = document.getElementById('price-display'); // Add this ID to a <span> or <p> in the config notice
+    const prices = { see: 80, basic: 100, ktm: 150 };
+    if(priceDisplayArea && prices[currentLevel]) {
+        priceDisplayArea.textContent = `${prices[currentLevel]} NPR`;
+    }
 });
+
+// **ACTION NEEDED in HTML**:
+// In selection_see.html, selection_basic.html, selection_ktm.html:
+// 1. Add `id="subject-selection-fieldset"` to the <fieldset> containing the subject checkboxes (only in selection_see.html).
+// 2. In the "config-notice" div, change the price line to something like:
+//    `<p>Price for <span id="level-name-display">this level</span> Access: <strong><span id="price-display">--</span></strong></p>`
+// 3. (Optional but good) Add `<span id="level-name-display">SEE NEB</span>` etc. in the right place based on the page. JS can update the price.
