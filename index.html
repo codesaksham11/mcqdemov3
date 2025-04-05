@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCQ Portal - Choose Your Level</title>
+    <link rel="stylesheet" href="css/style.css"> <!-- Link to future CSS -->
+</head>
+<body>
+    <header>
+        <h1>Welcome to the MCQ Challenge Portal</h1>
+    </header>
+
+    <main>
+        <section id="level-selection" aria-labelledby="level-select-heading">
+            <h2 id="level-select-heading">Select Your Challenge Level</h2>
+            <div class="portal-container">
+                <!-- SEE Portal -->
+                <div class="portal" id="portal-see" data-level="see">
+                    <div class="portal-visual"></div> <!-- For CSS styling -->
+                    <div class="portal-label">SEE NEB Questions</div>
+                    <span class="status-indicator" id="status-see"></span> <!-- For lock/unlocked icon -->
+                </div>
+
+                <!-- Basic Entrance Portal -->
+                <div class="portal" id="portal-basic" data-level="basic">
+                    <div class="portal-visual"></div>
+                    <div class="portal-label">Basic Entrance</div>
+                     <span class="status-indicator" id="status-basic"></span>
+                </div>
+
+                <!-- KTM Entrance Portal -->
+                <div class="portal" id="portal-ktm" data-level="ktm">
+                    <div class="portal-visual"></div>
+                    <div class="portal-label">KTM Entrance</div>
+                     <span class="status-indicator" id="status-ktm"></span>
+                </div>
+            </div>
+        </section>
+
+        <section id="code-entry" aria-labelledby="code-entry-heading">
+            <h2 id="code-entry-heading">Unlock Access</h2>
+            <div id="code-entry-area" style="display: none;"> <!-- Initially hidden -->
+                <label for="level-code-select">Level:</label>
+                <select id="level-code-select">
+                    <option value="">--Select Level--</option>
+                    <option value="see">SEE NEB</option>
+                    <option value="basic">Basic Entrance</option>
+                    <option value="ktm">KTM Entrance</option>
+                </select>
+
+                <label for="code-input">Enter Code:</label>
+                <input type="text" id="code-input" placeholder="Enter access code">
+
+                <button id="submit-code-btn">Submit Code</button>
+                <p id="code-message" class="message"></p> <!-- For success/error messages -->
+            </div>
+             <button id="show-code-entry-btn">Enter Access Code</button>
+        </section>
+
+    </main>
+
+    <footer>
+        <p>© 2024 MCQ Challenge Portal</p>
+    </footer>
+
+    <!-- Link to future JavaScript -->
+    <script src="js/index.js"></script>
+    <!-- We might add a utils.js later -->
+</body>
+</html>
