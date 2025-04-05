@@ -1,0 +1,488 @@
+/* css/style.css */
+
+/* --- Base Styles & Variables --- */
+:root {
+    --primary-color: #0056b3; /* Example: A nice blue */
+    --secondary-color: #f8f9fa; /* Light grey background */
+    --accent-color: #17a2b8; /* Teal for highlights */
+    --success-color: #28a745;
+    --error-color: #dc3545;
+    --text-color: #333;
+    --light-text-color: #fff;
+    --border-color: #ddd;
+
+    --feedback-correct-bg: rgba(40, 167, 69, 0.1); /* Light green */
+    --feedback-incorrect-bg: rgba(220, 53, 69, 0.1); /* Light red */
+    --feedback-skipped-bg: rgba(248, 249, 250, 0.8); /* Slightly off-white/grey */
+
+    --font-main: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+html {
+    font-size: 16px; /* Base font size */
+}
+
+body {
+    font-family: var(--font-main);
+    line-height: 1.6;
+    color: var(--text-color);
+    background-color: var(--secondary-color);
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+header, footer {
+    background-color: var(--primary-color);
+    color: var(--light-text-color);
+    padding: 1rem 2%;
+    text-align: center;
+}
+
+header h1, footer p {
+    margin: 0.5rem 0;
+}
+header a { /* Back link in selection */
+     color: #e0f7ff;
+     text-decoration: none;
+}
+header a:hover {
+     text-decoration: underline;
+}
+
+
+main {
+    flex: 1; /* Allows main content to fill available space */
+    padding: 1.5rem 5%; /* Add padding */
+    max-width: 1200px; /* Limit max width on large screens */
+    width: 100%;
+    margin: 1rem auto; /* Center content horizontally */
+}
+
+section {
+    background-color: #fff;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+h1, h2 {
+    margin-bottom: 1rem;
+    color: var(--primary-color);
+    text-align: center;
+}
+header h1 {
+     color: var(--light-text-color); /* Header H1 is light */
+}
+section h2 {
+    color: #444; /* Section headings slightly darker */
+     border-bottom: 1px solid var(--border-color);
+     padding-bottom: 0.5rem;
+}
+
+button {
+    display: inline-block;
+    background-color: var(--primary-color);
+    color: var(--light-text-color);
+    border: none;
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    text-align: center;
+    margin-top: 0.5rem;
+}
+
+button:hover, button:focus {
+    background-color: #004085; /* Darker blue */
+    outline: 2px solid var(--accent-color);
+    outline-offset: 2px;
+}
+button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+}
+
+/* --- Index Page Specific --- */
+#level-selection .portal-container {
+    display: flex; /* Use Flexbox for layout */
+    justify-content: space-around; /* Distribute space */
+    align-items: stretch; /* Make items same height */
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
+    gap: 1.5rem; /* Space between portals */
+}
+
+.portal {
+    flex: 1 1 250px; /* Flex grow, shrink, basis (min width before wrap) */
+    background-color: #f0f0f0;
+    border: 2px solid var(--border-color);
+    border-radius: 10px;
+    padding: 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative; /* For status indicator */
+    min-height: 150px; /* Minimum height */
+}
+
+.portal:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    border-color: var(--primary-color);
+}
+
+.portal-visual {
+    height: 40px; /* Placeholder for visual effect */
+    width: 40px;
+    margin: 0 auto 0.8rem auto;
+    background: linear-gradient(45deg, var(--accent-color), var(--primary-color));
+    border-radius: 50%; /* Example: Circle */
+    opacity: 0.8;
+}
+
+.portal-label {
+    font-weight: bold;
+    font-size: 1.1rem;
+}
+
+.status-indicator {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+}
+
+#code-entry {
+    margin-top: 2rem;
+    text-align: center; /* Center button initially */
+}
+#code-entry-area {
+    background-color: #e9ecef;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-top: 1rem;
+    display: flex;
+    flex-wrap: wrap; /* Allow wrapping */
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem; /* Space between elements */
+    text-align: left; /* Align labels nicely */
+}
+#code-entry-area label {
+    margin-right: 0.5rem;
+    font-weight: bold;
+}
+#code-entry-area select,
+#code-entry-area input[type="text"] {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    min-width: 150px; /* Ensure decent width */
+}
+#code-entry-area select:disabled {
+     background-color: #ddd;
+}
+
+.message {
+    margin-top: 0.8rem;
+    font-weight: bold;
+    padding: 0.5rem;
+    border-radius: 4px;
+    display: none; /* Hidden by default */
+    text-align: center;
+}
+.message.info {
+    color: var(--primary-color);
+    background-color: rgba(0, 86, 179, 0.1);
+}
+.message.success {
+    color: var(--success-color);
+    background-color: rgba(40, 167, 69, 0.1);
+}
+.message.error {
+    color: var(--error-color);
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+
+/* --- Selection Page Specific --- */
+#test-configuration .config-notice {
+    background-color: #e9ecef;
+    padding: 1rem;
+    border-radius: 5px;
+    margin-bottom: 1.5rem;
+    border-left: 4px solid var(--accent-color);
+}
+#test-configuration .config-notice strong {
+     color: var(--primary-color);
+}
+
+
+#config-form .form-group,
+#config-form fieldset {
+    margin-bottom: 1.5rem;
+    border: none; /* Reset fieldset border */
+}
+#config-form label {
+    display: block; /* Stack label above input */
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+#config-form input[type="number"],
+#config-form input[type="text"] /* if any added */ {
+    width: 100%; /* Full width on mobile */
+    max-width: 300px; /* Max width on desktop */
+    padding: 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+#config-form fieldset legend {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    font-size: 1.1rem;
+}
+#config-form fieldset div { /* Spacing for checkboxes */
+    margin-bottom: 0.5rem;
+}
+#config-form input[type="checkbox"] {
+    margin-right: 0.5rem;
+     transform: scale(1.2); /* Make checkbox slightly larger */
+}
+
+
+.error-message {
+    color: var(--error-color);
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+    display: none; /* Hidden by default, shown by JS */
+}
+
+/* --- MCQ Page Specific --- */
+#timer-display {
+    text-align: right;
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: -2.5rem; /* Position relative to header */
+    margin-right: 1rem; /* Spacing from edge */
+    color: var(--success-color); /* Green initially */
+}
+#timer-display span { /* The actual time numbers */
+     background-color: rgba(255,255,255, 0.2);
+     padding: 0.2rem 0.5rem;
+     border-radius: 4px;
+}
+
+#quiz-area .subject-header {
+    background-color: #e9ecef;
+    padding: 0.5rem 1rem;
+    margin: 2rem -1.5rem 1rem -1.5rem; /* Span section padding */
+    border-radius: 4px 4px 0 0;
+    font-size: 1.2rem;
+    text-align: left;
+    color: var(--primary-color);
+}
+
+#quiz-area .question-block {
+     margin-bottom: 2rem;
+     padding: 1rem;
+     border: 1px solid var(--border-color);
+     border-radius: 5px;
+     background-color: #fff; /* Ensure white background */
+}
+#quiz-area .question-text {
+    font-weight: bold;
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+#quiz-area .options label {
+    display: block; /* Each option on new line */
+    margin-bottom: 0.8rem;
+    padding: 0.5rem;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+    cursor: pointer;
+}
+#quiz-area .options label:hover {
+     background-color: #f0f8ff; /* Light blue hover */
+}
+
+#quiz-area .options input[type="radio"] {
+    margin-right: 0.8rem;
+    transform: scale(1.1);
+}
+#quiz-area #loading-message {
+    font-style: italic;
+    text-align: center;
+    padding: 2rem;
+}
+
+
+/* --- Results Page Specific --- */
+#summary-results {
+    text-align: center;
+    margin-bottom: 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    background-color: #fff;
+}
+#summary-results p {
+    font-size: 1.1rem;
+    margin: 0.5rem 0;
+}
+#summary-results strong {
+    color: var(--primary-color);
+}
+.feedback {
+    font-weight: bold;
+    font-size: 1.3rem;
+    margin-bottom: 1rem;
+    padding: 0.8rem;
+    border-radius: 5px;
+    background-color: #e9ecef; /* Default background */
+}
+
+/* Example feedback styling based on score class (JS adds p90, p80 etc) */
+.feedback.p100, .feedback.p90, .feedback.p80 { color: var(--success-color); background-color: var(--feedback-correct-bg); }
+.feedback.p70, .feedback.p60, .feedback.p50 { color: #ffc107; background-color: rgba(255, 193, 7, 0.1); } /* Yellow */
+.feedback.p40, .feedback.p30, .feedback.p20 { color: #fd7e14; background-color: rgba(253, 126, 20, 0.1); } /* Orange */
+.feedback.p10, .feedback.p0 { color: var(--error-color); background-color: var(--feedback-incorrect-bg); }
+
+#detailed-results #toggle-details-btn {
+     display: block; /* Button on its own line */
+     margin: 1rem auto; /* Center the button */
+}
+#details-container {
+    margin-top: 1.5rem;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1rem;
+}
+
+.result-item {
+    border: 1px solid var(--border-color);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    transition: background-color 0.3s ease;
+}
+.result-item .question-text {
+    font-weight: bold;
+    margin-bottom: 1rem;
+    border-bottom: 1px dashed #eee;
+    padding-bottom: 0.5rem;
+}
+
+.options-review .option-result {
+    margin-bottom: 0.5rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 4px;
+    position: relative; /* For indicator absolute positioning if needed */
+}
+
+/* Backgrounds for result items */
+.result-item.correct { background-color: var(--feedback-correct-bg); border-left: 5px solid var(--success-color); }
+.result-item.incorrect { background-color: var(--feedback-incorrect-bg); border-left: 5px solid var(--error-color);}
+.result-item.skipped { background-color: var(--feedback-skipped-bg); border-left: 5px solid #ccc; }
+
+/* Indicators (tick/cross) */
+.indicator {
+    font-weight: bold;
+    margin-left: 0.5rem;
+    display: inline-block; /* Allow margin */
+}
+.indicator.correct-indicator { color: var(--success-color); font-size: 1.1rem; }
+.indicator.incorrect-indicator { color: var(--error-color); font-size: 1.1rem;}
+
+/* Highlight user's selected answer text and correct answer text*/
+.option-result.user-answer-text { font-style: italic; } /* Example: italicize user choice */
+.option-result.correct-answer-text { /* font-weight: bold; */ /* Already bolding indicator, might be too much */ }
+
+
+/* --- Responsiveness --- */
+
+/* Medium screens (Tablets) */
+@media (max-width: 992px) {
+    html { font-size: 15px; }
+    main { padding: 1.5rem 3%; }
+    .portal { flex-basis: 300px; } /* Allow slightly wider portals */
+}
+
+/* Small screens (Large phones / Small tablets) */
+@media (max-width: 768px) {
+    html { font-size: 14px; }
+    header, footer { padding: 0.8rem 3%; }
+    main { padding: 1rem 3%; }
+
+    #level-selection .portal-container {
+        flex-direction: column; /* Stack portals vertically */
+        align-items: center; /* Center stacked portals */
+    }
+    .portal {
+        width: 90%; /* Make stacked portals wider */
+        max-width: 400px; /* Limit width */
+        flex-basis: auto; /* Reset flex basis */
+        min-height: 120px;
+    }
+
+    #code-entry-area {
+        flex-direction: column; /* Stack code entry elements */
+        align-items: stretch; /* Stretch elements to full width */
+    }
+     #code-entry-area select, #code-entry-area input[type="text"] {
+        width: 100%;
+        min-width: unset;
+    }
+
+    #config-form input[type="number"] {
+         max-width: none; /* Allow full width */
+    }
+    #timer-display {
+         text-align: center;
+         margin: 0.5rem 0;
+         float: none; /* Remove float */
+    }
+}
+
+/* Extra small screens (Phones) */
+@media (max-width: 480px) {
+     html { font-size: 13px; }
+     header, footer { padding: 0.6rem 3%; }
+     main { padding: 1rem 2%; }
+     section { padding: 1rem; }
+
+     button {
+        padding: 0.6rem 1.2rem;
+        width: 100%; /* Make buttons full width */
+        max-width: 320px; /* But not too wide */
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+     }
+      #code-entry #show-code-entry-btn { width: auto; display: inline-block;} /* Keep code entry toggle button normal width */
+      #code-entry #submit-code-btn { width: auto; display: inline-block;} /* Keep code entry toggle button normal width */
+       #submit-test-btn { display: block; margin: 1rem auto; } /* Ensure submit test is block and centered */
+
+
+     #config-form label { font-size: 1.1em; }
+     #config-form input[type="checkbox"] { transform: scale(1); } /* Reset scale for smaller screens if needed */
+
+     #quiz-area .options label { padding: 0.4rem; }
+     #quiz-area .options input[type="radio"] { margin-right: 0.5rem;}
+
+      .result-item { padding: 1rem;}
+
+}
