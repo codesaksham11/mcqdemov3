@@ -1,5 +1,7 @@
-// js/results.js
+// js/results.js (FINAL VERSION - Use this whole file)
 document.addEventListener('DOMContentLoaded', () => {
+    console.log("Results page loaded."); // DEBUG LOG
+
     const feedbackMessage = document.getElementById('feedback-message');
     const scoreDisplay = document.getElementById('score');
     const timeTakenDisplay = document.getElementById('time-taken');
@@ -9,148 +11,214 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Load Results ---
     const resultsString = sessionStorage.getItem('mcqTestResults');
     if (!resultsString) {
+        console.error("Test results not found in sessionStorage."); // DEBUG LOG
         displayError("Test results not found. Please complete a test first.");
+         if(toggleDetailsBtn) toggleDetailsBtn.style.display = 'none'; // Hide button if no results
         return;
     }
 
-    const results = JSON.parse(resultsString);
+    let results = null;
+    try {
+         results = JSON.parse(resultsString);
+         console.log("Loaded results from sessionStorage:", results); // DEBUG LOG
+    } catch (e) {
+        console.error("Error parsing results from sessionStorage:", e); // DEBUG LOG
+         displayError("Could not load test results. Data might be corrupted.");
+         if(toggleDetailsBtn) toggleDetailsBtn.style.display = 'none';
+         return;
+    }
+
+
+    // --- Validate Loaded Data ---
+    if (!results || !results.config || !results.questionsAsked || !results.userAnswers || typeof results.timeTaken === 'undefined' || typeof results.timeout === 'undefined') {
+         console.error("Loaded results data is incomplete:", results); // DEBUG LOG
+         displayError("Loaded results data is incomplete or invalid.");
+          if(toggleDetailsBtn) toggleDetailsBtn.style.display = 'none';
+         return;
+    }
+
     const config = results.config;
     const questionsAsked = results.questionsAsked;
     const userAnswers = results.userAnswers;
     const timeTaken = results.timeTaken; // In seconds
-    const timeout = results.timeout;
+    const timeout = results.timeout; // Should be true or false
+
+     console.log(`Timeout flag read as: ${timeout} (Type: ${typeof timeout})`); // DEBUG LOG
 
     // --- Calculate Score ---
     let correctAnswers = 0;
-    questionsAsked.forEach((q, index) => {
-        const correctAnswer = q.correctAnswer; // e.g., 'c'
-        const userAnswer = userAnswers[index]; // e.g., 'a', 'c', or undefined if skipped
-        if (userAnswer === correctAnswer) {
-            correctAnswers++;
-        }
-    });
+    if (Array.isArray(questionsAsked)) {
+        questionsAsked.forEach((q, index) => {
+            // Basic check on question structure
+            if (q && typeof q.correctAnswer !== 'undefined') {
+                 const correctAnswer = q.correctAnswer;
+                 const userAnswer = userAnswers[index];
+                 if (userAnswer === correctAnswer) {
+                    correctAnswers++;
+                 }
+            } else {
+                 console.warn(`Invalid question structure at index ${index}:`, q); // DEBUG LOG
+            }
+        });
+    } else {
+         console.error("questionsAsked is not an array:", questionsAsked); // DEBUG LOG
+         displayError("Error processing question results.");
+         return; // Stop further processing if questions are invalid
+    }
+
+
     const totalQuestions = questionsAsked.length;
     const scorePercentage = totalQuestions > 0 ? (correctAnswers / totalQuestions) * 100 : 0;
+    console.log(`Score calculated: ${correctAnswers}/${totalQuestions} (${scorePercentage}%)`); // DEBUG LOG
 
     // --- Display Summary ---
     // Score
     scoreDisplay.textContent = `${correctAnswers}/${totalQuestions}`;
 
     // Time Taken
-    if (timeout) {
+    if (timeout === true) { // Explicitly check for true
+        console.log("Displaying 'Time out'."); // DEBUG LOG
         timeTakenDisplay.textContent = "Time out";
         timeTakenDisplay.style.color = "red";
     } else {
         const minutes = Math.floor(timeTaken / 60);
         const seconds = timeTaken % 60;
+         console.log(`Displaying time taken: ${minutes} min ${seconds} sec`); // DEBUG LOG
         timeTakenDisplay.textContent = `${minutes} min ${seconds.toString().padStart(2, '0')} sec`;
-         timeTakenDisplay.style.color = ""; // Reset color if not timeout
+        timeTakenDisplay.style.color = ""; // Reset color
     }
 
-    // Feedback Message
+    // Feedback Message (No changes needed here, logic seems fine)
     let feedbackText = "";
-    if (scorePercentage === 100) {
-        feedbackText = "Perfect! You nailed it!";
-    } else if (scorePercentage >= 80) { // >= 80 and < 100 (implicit)
-        feedbackText = "Appreciable!";
-    } else if (scorePercentage >= 50) { // >= 50 and < 80
-        feedbackText = "Little more effort needed.";
-    } else if (scorePercentage >= 25) { // >= 25 and < 50
-        feedbackText = "Needs more practice.";
-    } else { // < 25
-        feedbackText = "Try harder!";
-    }
-     feedbackMessage.textContent = feedbackText;
-     feedbackMessage.className = `feedback p${Math.floor(scorePercentage/10) * 10}`; // Add class for potential styling based on score range
+    if (scorePercentage === 100) feedbackText = "Perfect! You nailed it!";
+    else if (scorePercentage >= 80) feedbackText = "Appreciable!";
+    else if (scorePercentage >= 50) feedbackText = "Little more effort needed.";
+    else if (scorePercentage >= 25) feedbackText = "Needs more practice.";
+    else feedbackText = "Try harder!";
+    feedbackMessage.textContent = feedbackText;
+    feedbackMessage.className = `feedback p${Math.floor(scorePercentage/10) * 10}`;
 
     // --- Detailed Results ---
-    toggleDetailsBtn.addEventListener('click', () => {
-        const isHidden = detailsContainer.style.display === 'none';
-        detailsContainer.style.display = isHidden ? 'block' : 'none';
-        toggleDetailsBtn.textContent = isHidden ? 'Hide Full Details' : 'Show Full Details';
-        if (isHidden && detailsContainer.innerHTML === '') { // Only generate if hidden and empty
-             generateDetailedResults(questionsAsked, userAnswers);
-        }
-    });
+    if (toggleDetailsBtn && detailsContainer) { // Ensure elements exist
+        toggleDetailsBtn.addEventListener('click', () => {
+             console.log("Toggle details button clicked."); // DEBUG LOG
+            // Use computed style to check visibility, more reliable than inline style check
+            const isCurrentlyHidden = window.getComputedStyle(detailsContainer).display === 'none';
+             console.log(`Details currently hidden? ${isCurrentlyHidden}`); // DEBUG LOG
+
+            if (isCurrentlyHidden) {
+                console.log("Expanding details."); // DEBUG LOG
+                if (detailsContainer.innerHTML === '') { // Only generate if empty
+                     console.log("Container is empty, generating details..."); // DEBUG LOG
+                    generateDetailedResults(questionsAsked, userAnswers);
+                } else {
+                     console.log("Container not empty, just showing."); // DEBUG LOG
+                }
+                detailsContainer.style.display = 'block'; // Show it
+                toggleDetailsBtn.textContent = 'Hide Full Details';
+            } else {
+                 console.log("Hiding details."); // DEBUG LOG
+                detailsContainer.style.display = 'none'; // Hide it
+                toggleDetailsBtn.textContent = 'Show Full Details';
+            }
+        });
+    } else {
+         console.error("Could not find toggle button or details container."); // DEBUG LOG
+         if(toggleDetailsBtn) toggleDetailsBtn.style.display = 'none'; // Hide button if container missing
+    }
+
 
     function generateDetailedResults(questions, answers) {
-        detailsContainer.innerHTML = ''; // Clear existing
+        // Ensure container exists before modifying
+        if (!detailsContainer) {
+             console.error("generateDetailedResults: detailsContainer not found.");
+             return;
+        }
+        console.log(`Generating details for ${questions.length} questions.`); // DEBUG LOG
+
+        detailsContainer.innerHTML = ''; // Clear previous content
+
+        if (!Array.isArray(questions) || questions.length === 0) {
+            console.warn("generateDetailedResults: No questions data to display."); // DEBUG LOG
+            detailsContainer.innerHTML = '<p>No detailed results available.</p>';
+            return;
+        }
+
 
         questions.forEach((q, index) => {
-            const userAnswer = answers[index]; // 'a', 'b', undefined etc.
-            const correctAnswerKey = q.correctAnswer; // 'c'
+             // Robust check for question validity
+             if (!q || typeof q.question !== 'string' || typeof q.options !== 'object' || q.options === null || typeof q.correctAnswer === 'undefined') {
+                console.warn(`Skipping invalid question object at index ${index}:`, q);
+                const errorItem = document.createElement('div');
+                errorItem.className = 'result-item skipped'; // Style as skipped/error
+                errorItem.innerHTML = `<p class="question-text"><strong>${index + 1}. Error loading this question data.</strong></p>`;
+                detailsContainer.appendChild(errorItem);
+                 return; // Skip to next iteration
+            }
+
+             console.log(`Generating details for Q${index}: ${q.question.substring(0, 30)}...`); // DEBUG LOG
+
+            const userAnswer = answers[index];
+            const correctAnswerKey = q.correctAnswer;
 
             const resultItem = document.createElement('div');
             resultItem.className = 'result-item'; // Base class
 
-            let itemStatusClass = '';
-             let correctIndicatorAdded = false; // Ensure tick is only on the truly correct answer
+            let itemStatusClass = 'skipped'; // Default to skipped
+            if (userAnswer === correctAnswerKey) {
+                itemStatusClass = 'correct';
+            } else if (userAnswer !== undefined) { // User answered, but incorrectly
+                itemStatusClass = 'incorrect';
+            }
+            resultItem.classList.add(itemStatusClass); // Add correct/incorrect/skipped class
 
-            // Question Text
             const questionTextP = document.createElement('p');
             questionTextP.className = 'question-text';
-            questionTextP.innerHTML = `<strong>${index + 1}. ${q.question}</strong>`; // Bold question
+            questionTextP.innerHTML = `<strong>${index + 1}. ${q.question}</strong>`;
             resultItem.appendChild(questionTextP);
 
-             const optionsDiv = document.createElement('div');
-             optionsDiv.className = 'options-review'; // Specific class for review layout
+            const optionsDiv = document.createElement('div');
+            optionsDiv.className = 'options-review';
 
-             // Determine overall status for background color
-            if (userAnswer === undefined) {
-                itemStatusClass = 'skipped'; // White background (default or specific class)
-                 resultItem.classList.add(itemStatusClass);
-            } else if (userAnswer === correctAnswerKey) {
-                 itemStatusClass = 'correct'; // Less bright green
-                 resultItem.classList.add(itemStatusClass);
-            } else {
-                itemStatusClass = 'incorrect'; // Less bright red
-                 resultItem.classList.add(itemStatusClass);
-            }
-
-
-            // Loop through options (a, b, c, d)
+            // Loop through options
             for (const key in q.options) {
-                 const optionDiv = document.createElement('div');
-                 optionDiv.className = 'option-result'; // Class for styling individual options
+                 if (Object.hasOwnProperty.call(q.options, key)) { // Ensure it's a direct property
+                    const optionText = q.options[key];
+                    const optionDiv = document.createElement('div');
+                    optionDiv.className = 'option-result';
 
-                let indicator = '';
-                // Check if this option is the correct answer
-                 if (key === correctAnswerKey) {
-                      indicator += ' <span class="indicator correct-indicator">✓</span>'; // Correct answer indicator
-                       correctIndicatorAdded = true;
+                    let indicator = '';
+                    if (key === correctAnswerKey) {
+                        indicator += ' <span class="indicator correct-indicator">✓</span>';
+                    }
+                    if (key === userAnswer && userAnswer !== correctAnswerKey) {
+                        indicator += ' <span class="indicator incorrect-indicator">✗</span>';
+                    }
+
+                    optionDiv.innerHTML = `${key.toUpperCase()}) ${optionText}${indicator}`;
+
+                    if (key === correctAnswerKey) {
+                         optionDiv.classList.add('correct-answer-text');
+                    }
+                    if (key === userAnswer) {
+                        optionDiv.classList.add('user-answer-text');
+                    }
+                    optionsDiv.appendChild(optionDiv);
                  }
-                 // Check if this was the user's (wrong) answer
-                if (key === userAnswer && userAnswer !== correctAnswerKey) {
-                     indicator += ' <span class="indicator incorrect-indicator">✗</span>'; // User's wrong choice indicator
-                }
-
-
-                optionDiv.innerHTML = `${key.toUpperCase()}) ${q.options[key]}${indicator}`;
-
-                 // Optionally add extra styling for the chosen/correct option text itself
-                if (key === correctAnswerKey) {
-                     optionDiv.classList.add('correct-answer-text'); // Style the text of the right answer
-                }
-                if (key === userAnswer) {
-                    optionDiv.classList.add('user-answer-text'); // Style the text of the user's selected answer
-                }
-
-
-                optionsDiv.appendChild(optionDiv);
             }
-             resultItem.appendChild(optionsDiv);
-
-
+            resultItem.appendChild(optionsDiv);
             detailsContainer.appendChild(resultItem);
         });
+         console.log("Finished generating details.");// DEBUG LOG
     }
 
      function displayError(message) {
-         // Display error within the summary section perhaps
          const summarySection = document.getElementById('summary-results');
          if (summarySection) {
-             summarySection.innerHTML = `<p style="color: red;">${message}</p>`;
+             summarySection.innerHTML = `<p style="color: red; font-weight: bold;">${message}</p>`;
+         } else {
+             // Fallback if summary section not found
+             document.body.insertAdjacentHTML('afterbegin', `<p style="color: red; text-align: center; padding: 1rem; background: white;">${message}</p>`);
          }
-          if(toggleDetailsBtn) toggleDetailsBtn.style.display = 'none'; // Hide details button
      }
 });
