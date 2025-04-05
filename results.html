@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Results</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Your Test Results</h1>
+        <p><a href="index.html">Take Another Test</a></p> <!-- Link back to home -->
+    </header>
+
+    <main>
+        <section id="summary-results" aria-labelledby="summary-heading">
+            <h2 id="summary-heading">Summary</h2>
+            <div id="feedback-message" class="feedback"></div>
+            <p><strong>Score:</strong> <span id="score">--/--</span></p>
+            <p><strong>Time Taken:</strong> <span id="time-taken">--:--</span></p>
+        </section>
+
+        <section id="detailed-results" aria-labelledby="details-heading">
+            <h2 id="details-heading">Detailed Review</h2>
+            <button id="toggle-details-btn">Show Full Details</button>
+            <div id="details-container" style="display: none;">
+                <!-- Detailed results will be loaded here by JavaScript -->
+                <!-- Example structure for one result item:
+                 <div class="result-item correct/incorrect/skipped">
+                     <p class="question-text">1. [Question Text]</p>
+                     <div class="options">
+                        <div class="option-result">[ ] A) Option A <span class="indicator">✓/✗</span></div>
+                        <div class="option-result">[ ] B) Option B <span class="indicator">✓/✗</span></div>
+                        <div class="option-result">[✓] C) Option C <span class="indicator">✓/✗</span> <-- User selected -->
+                 <!--    <div class="option-result">[ ] D) Option D <span class="indicator">✓/✗</span></div>
+                    </div>
+                    <p class="explanation">Correct Answer: C) Mitochondrion</p> <-- Show only if incorrect? Or always? TBD
+                 </div>
+                -->
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2024 MCQ Challenge Portal</p>
+    </footer>
+
+    <!-- Link to JavaScript for this page -->
+    <script src="js/results.js"></script>
+    <!-- We might add utils.js later -->
+</body>
+</html>
