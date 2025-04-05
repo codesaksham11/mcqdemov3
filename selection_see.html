@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configure SEE NEB Test</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <header>
+        <h1>Configure Your SEE NEB Practice Test</h1>
+        <p><a href="index.html">Back to Level Select</a></p> <!-- Link back to home -->
+    </header>
+
+    <main>
+        <section id="test-configuration" aria-labelledby="config-heading">
+            <h2 id="config-heading">Test Settings</h2>
+
+            <div class="config-notice">
+                <p><strong>Note:</strong> Access to the test requires a valid code.</p>
+                <p>Price for SEE NEB Level Access: <strong>80 NPR</strong></p>
+                <!-- Add link to purchase page if applicable later -->
+            </div>
+
+            <form id="config-form">
+                <div class="form-group">
+                    <label for="num-questions">Number of Questions (1-100):</label>
+                    <input type="number" id="num-questions" name="num-questions" min="1" max="100" required>
+                    <p id="error-num-questions" class="error-message"></p>
+                </div>
+
+                <div class="form-group">
+                    <label for="time-limit">Time Limit (1-180 minutes):</label>
+                    <input type="number" id="time-limit" name="time-limit" min="1" max="180" required>
+                    <p id="error-time-limit" class="error-message"></p>
+                </div>
+
+                <fieldset class="form-group">
+                    <legend>Select Subjects (Choose at least one):</legend>
+                    <div>
+                        <input type="checkbox" id="subject-math" name="subject" value="Math">
+                        <label for="subject-math">Math</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="subject-opt-math" name="subject" value="Opt Math">
+                        <label for="subject-opt-math">Optional Math</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="subject-science" name="subject" value="Science">
+                        <label for="subject-science">Science</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="subject-social" name="subject" value="Social">
+                        <label for="subject-social">Social</label>
+                    </div>
+                    <p id="error-subjects" class="error-message"></p>
+                </fieldset>
+
+                <button type="submit" id="start-test-btn">Start Test</button>
+            </form>
+             <p id="config-message" class="message"></p> <!-- For general messages like subject requirement -->
+        </section>
+    </main>
+
+    <footer>
+         <p>© 2024 MCQ Challenge Portal</p>
+    </footer>
+
+    <!-- Link to JavaScript for this page -->
+    <script src="js/selection.js"></script>
+    <!-- We might add utils.js later -->
+
+</body>
+</html>
